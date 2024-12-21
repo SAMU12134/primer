@@ -1,1 +1,166 @@
-print("2gdfgdfg")
+import discord
+import os
+import random
+import requests
+from discord.ext import commands
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix='$', intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
+
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Hola, soy un bot {bot.user}!')
+
+@bot.command()
+async def heh(ctx, count_heh = 5):
+    await ctx.send("he" * count_heh)
+
+@bot.command()
+async def suma(ctx, num1:int,num2:int):
+    await ctx.send(f"La suma de {num1} y {num2} es {num1+num2}")
+
+
+@bot.command()
+async def adicion(ctx, num1:float,num2:float):
+    await ctx.send(f"La suma de {num1} y {num2} es {num1+num2}") 
+
+
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    await ctx.send(f'{member.name} se a unido a este maravilloso grupo {discord.utils.format_dt(member.joined_at)}')
+
+
+@bot.command()
+async def ayuda(ctx):
+    mensaje = """hola soy un ayudante perfecto para tus partidas de fornite te puedo brindar lugares para caer, las nuevas armas e informaciones que tienes que tner en cuenta para  ser el mejor en este juego
+    1-crear estrategias
+    2-armas nuevas
+    3-informacion del juego"""
+    await ctx.send(mensaje)  
+
+
+@bot.command()
+async def mem(ctx):
+    with open('images/meme1.png', 'rb') as f:
+        # ¡Vamos a almacenar el archivo de la biblioteca Discord convertido en esta variable!
+        picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture) 
+
+@bot.command()
+async def memR(ctx):
+    img_name = os.listdir('images')
+    with open(f'images/{random.choice(img_name)}', 'rb') as f:
+            picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture) 
+
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
+
+
+@bot.command('duck')
+async def duck(ctx):
+    '''Una vez que llamamos al comando duck, 
+    el programa llama a la función get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
+
+
+@bot.command()
+async def poke(ctx,arg):
+    try:
+        pokemon = arg.split(" ",1)[0].lower()
+        result = requests.get("https://pokeapi.co/api/v2/pokemon/"+pokemon)
+        if result.text == "Not Found":
+            await ctx.send("Pokemon no encontrado")
+        else:
+            image_url = result.json()["sprites"]["front_default"]
+            print(image_url)
+            await ctx.send(image_url)
+
+    except Exception as e:
+        print("Error:", e)
+@poke.error
+async def error_type(ctx,error):
+    if isinstance(error,commands.errors.MissingRequiredArgument):
+        await ctx.send("Tienes que darme un pokemon")    
+   
+
+@bot.command()
+async def VICTORY(ctx):
+    vic_name = os.listdir('fornite_victorias')
+    with open(f'fornite_victorias/{random.choice(vic_name)}', 'rb') as f:
+            picture = discord.File(f)
+    # A continuación, podemos enviar este archivo como parámetro.
+    await ctx.send(file=picture)
+
+
+@bot.command()
+async def contaminacion(ctx):
+    await ctx.send(f"""
+    Hola, soy un bot {bot.user}!
+    """)# esta linea saluda
+    await ctx.send("Quieres hablar de fornite o de counter strike? Responde con 'fornite' o 'counter'.")
+# Esperar la respuesta del usuario
+    def check(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content in ['counter', 'fornite']
+    response = await bot.wait_for('message', check=check)
+    if response:
+        if response.content in ['fornite']:
+            await ctx.send("""Fortnite es un videojuego del año 2017 desarrollado por la empresa Epic Games lanzado como diferentes paquetes de software que presentan seis diferentes modos de juego, pero que comparten el mismo motor de juego y mecánicas. Fue anunciado en los premios Spike Video Game Awards en 2011.""")
+            await ctx.send("""modos de juego-los dos modos de juego principales están configurados para ser títulos gratuitos, aunque actualmente Salvar el mundo está en un acceso anticipado y requiere ser comprado. Ambos juegos se monetizan mediante el uso de V-Bucks (PaVos o Monedas V en español3​), la moneda del juego que también se puede ganar solo a través de Salvar el mundo. Los V-Bucks en Salvar el mundo se pueden usar para comprar piñatas con forma de llamas para obtener una selección aleatoria de artículos. En Battle Royale, los V-Bucks se pueden usar para comprar artículos estéticos como modelos de personajes o similares, o también se puede usar para comprar el pase de batalla, una progresión escalonada de recompensas de personalización para ganar experiencia y completar ciertos objetivos durante el juego, en el curso de una temporada de Battle Royale.""")   
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas saber sobre otros juegos, estaremos en contacto.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+    await ctx.send("Quieres saber en que capitulo estamos, responde 'sí' o 'no'.")
+    def check1(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content in ['si', 'no']
+ 
+    response1 = await bot.wait_for('message', check=check1)
+    if response1:
+        if response1.content == "si":
+            await ctx.send("capitulo 6 - temporada 1") 
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas hablar sobre juegos, estaremos en contacto.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+
+
+
+
+    
+if response2.content in ['counter']:
+        await ctx.send("""Counter-Strike (conocido también como Counter Strike 1.6 para diferenciarlo de títulos posteriores) es un videojuego de disparos en primera persona multijugador (ya sea en LAN o en línea) desarrollado por Valve para Microsoft Windows. Es una modificación completa del juego Half-Life, realizada por Minh Le y Jess Cliffe, quienes lanzaron la primera versión el 18 de junio de 1999.""")
+        await ctx.send("""principios-La acción de Counter-Strike se desarrolla en rondas de una duración elegida por el que las crea, en la cual un equipo de terroristas (T) se enfrenta a un equipo de antiterroristas (CT). El equipo victorioso es el que cumpla todos sus objetivos de victoria, de situación o la eliminación de todos los jugadores del otro equipo. Si al final de la ronda no hay victoria directa de uno de los dos equipos, el equipo que no realizó sus objetivos pierde por eliminación.""")   
+    else:
+        await ctx.send("Está bien, si alguna vez necesitas saber sobre otros juegos, estaremos en contacto.")
+else:
+    await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+await ctx.send("Quieres saber en que capitulo estamos, responde 'sí' o 'no'.")
+    def check1(message):
+        return message.author == ctx.author and message.channel == ctx.channel and message.content in ['si', 'no']
+ 
+    response2 = await bot.wait_for('message', check=check1)
+    if response2:
+        if response2.content == "si":
+            await ctx.send("capitulo 6 - temporada 1") 
+        else:
+            await ctx.send("Está bien, si alguna vez necesitas hablar sobre juegos, estaremos en contacto.")
+    else:
+        await ctx.send("Lo siento, no pude entender tu respuesta. Inténtalo de nuevo.")
+
+
+
+bot.run("")
+ 
